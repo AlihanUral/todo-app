@@ -1,5 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
+
 metadata:
   name: todo-backend
   namespace: {{ .Values.namespace }}
@@ -25,6 +26,12 @@ spec:
           ports:
             - containerPort: {{ .Values.backend.containerPort }}
 
+          resources:
+            requests:
+              memory: {{ .Values.backend.resources.requests.memory | quote }}
+            limits:
+              memory: {{ .Values.backend.resources.limits.memory | quote }}
+
           env:
             - name: DB_HOST
               valueFrom:
@@ -36,7 +43,7 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: todo-config
-                  key: DB_PORT
+                key: DB_PORT
 
             - name: DB_NAME
               valueFrom:
