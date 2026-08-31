@@ -6,7 +6,7 @@ metadata:
   namespace: monitoring
 
   labels:
-    release: monitoring
+    Release: monitoring
 
 spec:
   groups:
