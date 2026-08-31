@@ -1,0 +1,44 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+
+metadata:
+  name: todo-backend-memory-alert
+  namespace: monitoring
+
+  labels:
+    release: monitoring
+
+spec:
+  groups:
+    - name: todo-backend-memory
+      rules:
+        - alert: TodoBackendHighMemory
+          expr: |
+            100 *
+            sum by (pod) (
+              container_memory_working_set_bytes{
+                namespace="todo",
+                pod=~"todo-backend-.*",
+                container!="",
+                container!="POD"
+              }
+            )
+            /
+            sum by (pod) (
+              kube_pod_container_resource_requests{
+                namespace="todo",
+                pod=~"todo-backend-.*",
+                resource="memory",
+                unit="byte"
+              }
+            )
+            > 80
+
+          for: 1m
+
+          labels:
+            severity: warning
+
+          annotations:
+            summary: "Todo backend yüksek RAM kullanıyor"
+            description: 'Pod {{ "{{ $labels.pod }}" }} memory request''in %80''inden fazlasını kullanıyor.'
